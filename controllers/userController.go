@@ -12,8 +12,8 @@ import (
 func CreateUser(c *gin.Context) {
 	//get the data
 	var user struct{
-		Email string `json:"email" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		Email string `json:"email" binding:"required,email,max=50"`
+		Password string `json:"password" binding:"required,max=15,min=8"`
 		RoleName string `json:"roleName"`
 	}
 	//validation
