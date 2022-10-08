@@ -1,2 +1,1 @@
-# golang-rest-api
-My First Golang REST API
+#onlineAcademy (Udemy Clone)
