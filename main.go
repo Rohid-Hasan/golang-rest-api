@@ -2,19 +2,16 @@ package main
 
 import (
 	"github.com/Rohid-Hasan/online-academy-with-golang/initializers"
-	"github.com/gin-gonic/gin"
+	"github.com/Rohid-Hasan/online-academy-with-golang/migrate"
+	"github.com/Rohid-Hasan/online-academy-with-golang/routes"
 )
 
 func init(){
-	initializers.LoadEnvVariables();
+	initializers.LoadEnvVariables()
+	initializers.ConnectToDB()
+	migrate.MigrateAllModels()
 }
 
 func main() {
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run()
+	routes.InitRoutes()
 }
