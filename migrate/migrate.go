@@ -7,5 +7,5 @@ import (
 
 func MigrateAllModels() {
 	//initializers.DB.Migrator().DropTable(&models.User{})
-	initializers.DB.AutoMigrate(&models.User{})
+	initializers.DB.AutoMigrate(&models.User{},&models.Student{})
 }

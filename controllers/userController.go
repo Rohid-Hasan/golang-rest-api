@@ -9,15 +9,17 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-func CreateUser(c *gin.Context) {
+//signup as a student
+func SignUp(c *gin.Context) {
 	//get the data
-	var user struct{
+	var requestBody struct{
 		Email string `json:"email" binding:"required,email,max=50"`
 		Password string `json:"password" binding:"required,max=15,min=8"`
-		RoleName string `json:"roleName"`
+		RoleName string `json:"RoleName"`
+		Name string `json:"name" binding:"required"`
 	}
 	//validation
-	err := c.ShouldBindBodyWith(&user,binding.JSON)
+	err := c.ShouldBindBodyWith(&requestBody,binding.JSON)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest,
 			gin.H{
@@ -28,15 +30,18 @@ func CreateUser(c *gin.Context) {
 	}
 	//check if the email exist or not
 	//create the User
-	post := models.User{Email: user.Email, Password: user.Password, RoleName: user.RoleName};
-	result := initializers.DB.Create(&post);
+	user := models.User{Email: requestBody.Email, Password: requestBody.Password, RoleName: requestBody.RoleName};
+	userResp := initializers.DB.Create(&user);
+	student := models.Student{Name: requestBody.Name,UserID: int(user.ID)}
+	studentResp := CreateStudent(&student);
 	//return a response
-	if result.Error != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError,gin.H{"err":result.Error})
+	if userResp.Error != nil || studentResp.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError,gin.H{"err":"Ooops Database Error !!!"})
 		return
 	}
-	c.JSON(200,gin.H{
-		"post":post,
+	c.JSON(http.StatusOK,gin.H{
+		"user":user,
+		"student":student,
 	});
 }
 
@@ -44,7 +49,7 @@ func CreateUser(c *gin.Context) {
 func GetUsers(c *gin.Context)  {
 	//get all the users
 	var users []models.User
-	initializers.DB.Find(&users)
+	initializers.DB.Preload("Student").Find(&users);
 	// response
 	c.JSON(http.StatusOK, users);
 }
